@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = 'jenkins-pipeline-assignment'
+        BUILD_ENV = 'development'
+    }
+
+    options {
+        timestamps()
+        timeout(time: 10, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Initialize') {
+            steps {
+                echo '======================================'
+                echo 'Starting Declarative Pipeline'
+                echo "Application: ${env.APP_NAME}"
+                echo "Environment: ${env.BUILD_ENV}"
+                echo '======================================'
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                echo 'Checkout stage is running.'
+                echo 'Git checkout will be configured in a later step.'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Build stage is running.'
+                echo 'Build configuration will be added later.'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Test stage is running.'
+                echo 'Test configuration will be added later.'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'SUCCESS: Declarative Pipeline completed.'
+        }
+
+        failure {
+            echo 'FAILURE: Declarative Pipeline failed.'
+        }
+
+        always {
+            echo 'Declarative Pipeline execution finished.'
+        }
+    }
+}
