@@ -6,6 +6,26 @@ pipeline {
         BUILD_ENV = 'development'
     }
 
+    parameters {
+        choice(
+            name: 'DEPLOY_ENV',
+            choices: ['dev', 'qa', 'prod'],
+            description: 'Select the target environment'
+        )
+
+        booleanParam(
+            name: 'RUN_TESTS',
+            defaultValue: true,
+            description: 'Run the Test stage'
+        )
+
+        string(
+            name: 'RELEASE_VERSION',
+            defaultValue: '1.0.0',
+            description: 'Enter the release version'
+        )
+    }
+
     options {
         timestamps()
         timeout(time: 10, unit: 'MINUTES')
@@ -18,7 +38,10 @@ pipeline {
                 echo '======================================'
                 echo 'Starting Declarative Pipeline'
                 echo "Application: ${env.APP_NAME}"
-                echo "Environment: ${env.BUILD_ENV}"
+                echo "Default Environment: ${env.BUILD_ENV}"
+                echo "Selected Environment: ${params.DEPLOY_ENV}"
+                echo "Release Version: ${params.RELEASE_VERSION}"
+                echo "Run Tests: ${params.RUN_TESTS}"
                 echo '======================================'
             }
         }
@@ -26,21 +49,35 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checkout stage is running.'
-                echo 'Git checkout will be configured in a later step.'
+                echo 'Actual Git checkout will be implemented later.'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Build stage is running.'
-                echo 'Build configuration will be added later.'
+                echo "Building ${env.APP_NAME}"
+                echo "Release version: ${params.RELEASE_VERSION}"
+                echo "Target environment: ${params.DEPLOY_ENV}"
             }
         }
 
         stage('Test') {
+            when {
+                expression {
+                    return params.RUN_TESTS
+                }
+            }
+
             steps {
                 echo 'Test stage is running.'
-                echo 'Test configuration will be added later.'
+                echo 'Actual automated tests will be implemented later.'
+            }
+        }
+
+        stage('Deployment Plan') {
+            steps {
+                echo "Selected deployment environment: ${params.DEPLOY_ENV}"
+                echo 'This is a demonstration only. No deployment is performed.'
             }
         }
     }
