@@ -1,98 +1,115 @@
 pipeline {
-    agent any
+agent any
 
-    environment {
-        APP_NAME = 'jenkins-pipeline-assignment'
-        BUILD_ENV = 'development'
-    }
-
-    parameters {
-        choice(
-            name: 'DEPLOY_ENV',
-            choices: ['dev', 'qa', 'prod'],
-            description: 'Select the target environment'
-        )
-
-        booleanParam(
-            name: 'RUN_TESTS',
-            defaultValue: true,
-            description: 'Run the Test stage'
-        )
-
-        string(
-            name: 'RELEASE_VERSION',
-            defaultValue: '1.0.0',
-            description: 'Enter the release version'
-        )
-    }
-
-    options {
-        timestamps()
-        timeout(time: 10, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
-
-    stages {
-        stage('Initialize') {
-            steps {
-                echo '======================================'
-                echo 'Starting Declarative Pipeline'
-                echo "Application: ${env.APP_NAME}"
-                echo "Default Environment: ${env.BUILD_ENV}"
-                echo "Selected Environment: ${params.DEPLOY_ENV}"
-                echo "Release Version: ${params.RELEASE_VERSION}"
-                echo "Run Tests: ${params.RUN_TESTS}"
-                echo '======================================'
-            }
-        }
-
-        stage('Checkout') {
-            steps {
-                echo 'Checkout stage is running.'
-                echo 'Actual Git checkout will be implemented later.'
-            }
-        }
-
-        stage('Build') {
-            steps {
-                echo "Building ${env.APP_NAME}"
-                echo "Release version: ${params.RELEASE_VERSION}"
-                echo "Target environment: ${params.DEPLOY_ENV}"
-            }
-        }
-
-        stage('Test') {
-            when {
-                expression {
-                    return params.RUN_TESTS
-                }
-            }
-
-            steps {
-                echo 'Test stage is running.'
-                echo 'Actual automated tests will be implemented later.'
-            }
-        }
-
-        stage('Deployment Plan') {
-            steps {
-                echo "Selected deployment environment: ${params.DEPLOY_ENV}"
-                echo 'This is a demonstration only. No deployment is performed.'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'SUCCESS: Declarative Pipeline completed.'
-        }
-
-        failure {
-            echo 'FAILURE: Declarative Pipeline failed.'
-        }
-
-        always {
-            echo 'Declarative Pipeline execution finished.'
-        }
-    }
+```
+environment {
+    APP_NAME = 'hiring-app'
+    BUILD_ENV = 'development'
+    SOURCE_REPO = 'https://github.com/betawins/hiring-app.git'
+    SOURCE_BRANCH = 'main'
 }
+
+parameters {
+    choice(
+        name: 'DEPLOY_ENV',
+        choices: ['dev', 'qa', 'prod'],
+        description: 'Select the target environment'
+    )
+
+    booleanParam(
+        name: 'RUN_TESTS',
+        defaultValue: true,
+        description: 'Run Maven tests'
+    )
+
+    string(
+        name: 'RELEASE_VERSION',
+        defaultValue: '0.1',
+        description: 'Application release version'
+    )
+}
+
+options {
+    timestamps()
+    timeout(time: 30, unit: 'MINUTES')
+    buildDiscarder(logRotator(numToKeepStr: '10'))
+}
+
+stages {
+    stage('Initialize') {
+        steps {
+            echo '======================================'
+            echo 'Starting Declarative CI/CD Pipeline'
+            echo "Application: ${env.APP_NAME}"
+            echo "Selected Environment: ${params.DEPLOY_ENV}"
+            echo "Release Version: ${params.RELEASE_VERSION}"
+            echo "Run Tests: ${params.RUN_TESTS}"
+            echo '======================================'
+        }
+    }
+
+    stage('Checkout Assignment Configuration') {
+        steps {
+            checkout scm
+
+            sh '''
+                set -eu
+
+                echo "Checking assignment configuration files..."
+
+                test -f environment/stage.json
+                test -f node/prod.json
+
+                python3 -m json.tool environment/stage.json >/dev/null
+                python3 -m json.tool node/prod.json >/dev/null
+
+                echo "Both JSON files exist and contain valid JSON."
+            '''
+        }
+    }
+
+    stage('Checkout Application') {
+        steps {
+            dir('application') {
+                git branch: "${SOURCE_BRANCH}",
+                    url: "${SOURCE_REPO}"
+
+                sh '''
+                    set -eu
+
+                    test -f pom.xml
+
+                    echo "Application source checkout successful."
+                    echo "Git commit:"
+                    git rev-parse --short HEAD
+                '''
+            }
+        }
+    }
+
+    stage('Validate Configuration') {
+        steps {
+            sh '''
+                set -eu
+
+                python3 - <<'PY'
+```
+
+import json
+
+with open("environment/stage.json", encoding="utf-8") as f:
+environment = json.load(f)
+
+with open("node/prod.json", encoding="utf-8") as f:
+node = json.load(f)
+
+required_environment = ["environment", "appName", "version"]
+required_node = ["environment", "nodeName", "nodeType", "region"]
+
+for key in required_environment:
+if not environment.get(key):
+raise SystemExit("Missing environment configuration: " + key)
+
+for key in required_node:
+if not node.get(key):
+raise SystemExit("Missing node configuration: " +
