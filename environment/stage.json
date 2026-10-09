@@ -1,0 +1,27 @@
+{
+"environment": "stage",
+"appName": "hiring-app",
+"version": "0.1",
+"logLevel": "INFO",
+"application": {
+"sourceRepository": "https://github.com/betawins/hiring-app.git",
+"branch": "main",
+"artifact": "hiring.war"
+},
+"quality": {
+"sonarQubeEnabled": true,
+"qualityGateRequired": true
+},
+"artifactRepository": {
+"type": "nexus",
+"repository": "maven-releases"
+},
+"deployment": {
+"type": "tomcat",
+"contextPath": "/hiring"
+},
+"features": {
+"debug": false,
+"maintenanceMode": false
+}
+}
