@@ -1,0 +1,36 @@
+node {
+    env.APP_NAME = 'jenkins-pipeline-assignment'
+    env.BUILD_ENV = 'development'
+
+    try {
+        stage('Initialize') {
+            echo '======================================'
+            echo 'Starting Scripted Pipeline'
+            echo "Application: ${env.APP_NAME}"
+            echo "Environment: ${env.BUILD_ENV}"
+            echo '======================================'
+        }
+
+        stage('Checkout') {
+            echo 'Checkout stage is running.'
+            echo 'Git checkout will be configured later.'
+        }
+
+        stage('Build') {
+            echo 'Build stage is running.'
+            echo 'Build configuration will be added later.'
+        }
+
+        stage('Test') {
+            echo 'Test stage is running.'
+            echo 'Test configuration will be added later.'
+        }
+
+    } catch (err) {
+        echo "FAILURE: ${err.getMessage()}"
+        throw err
+
+    } finally {
+        echo 'Scripted Pipeline execution finished.'
+    }
+}
