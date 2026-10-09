@@ -1,0 +1,22 @@
+{
+"environment": "prod",
+"nodeName": "jenkins-tomcat-deployment-node",
+"nodeType": "deployment-target",
+"region": "eu-north-1",
+"availabilityZone": "eu-north-1b",
+"instanceType": "t3.small",
+"os": "Ubuntu",
+"runtime": {
+"type": "Apache Tomcat",
+"port": 8080
+},
+"resources": {
+"purpose": "Application deployment",
+"artifact": "hiring.war"
+},
+"labels": {
+"environment": "prod",
+"application": "hiring-app",
+"team": "devops"
+}
+}
